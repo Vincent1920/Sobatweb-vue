@@ -1,0 +1,2 @@
+<script setup lang="ts">withDefaults(defineProps<{ title?: string; description?: string }>(), { title: 'Belum ada data', description: 'Data akan tampil di sini setelah tersedia.' })</script>
+<template><div class="rounded-xl border border-dashed border-slate-300 p-8 text-center"><h3 class="font-semibold">{{ title }}</h3><p class="mt-1 text-sm text-slate-500">{{ description }}</p><div class="mt-4"><slot /></div></div></template>
