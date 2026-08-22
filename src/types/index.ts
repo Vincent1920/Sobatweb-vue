@@ -1,2 +1,5 @@
 export * from './api'
 export * from './auth'
+export * from './section'
+export * from './dashboard'
+export * from './school'
