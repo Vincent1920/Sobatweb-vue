@@ -1,8 +1,13 @@
 {
-  "name": "sobatweb-vue",
+  
+  "name": "sobatweb",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.0",
+  "description": "SobatWeb School Website Builder",
+  "author": "Vincent Luhulima",
+  "license": "UNLICENSED",
   "type": "module",
+
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
