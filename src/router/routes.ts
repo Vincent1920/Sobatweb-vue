@@ -21,7 +21,7 @@ export const routes: RouteRecordRaw[] = [
       { path: 'media', name: 'dashboard-media', component: () => import('@/views/dashboard/FeatureView.vue'), meta: { title: 'Media' } },
       { path: 'templates', name: 'dashboard-templates', component: () => import('@/views/dashboard/FeatureView.vue'), meta: { title: 'Template' } },
       { path: 'subdomain', name: 'dashboard-subdomain', component: () => import('@/views/dashboard/FeatureView.vue'), meta: { title: 'Subdomain' } },
-      { path: 'settings', name: 'dashboard-settings', component: () => import('@/views/dashboard/FeatureView.vue'), meta: { title: 'Pengaturan Sekolah' } },
+      { path: 'settings', name: 'dashboard-settings', component: () => import('@/views/dashboard/SchoolSettingsView.vue'), meta: { title: 'Pengaturan Sekolah' } },
     ],
   },
   { path: '/dashboard/website/pages', redirect: '/dashboard/pages' },
