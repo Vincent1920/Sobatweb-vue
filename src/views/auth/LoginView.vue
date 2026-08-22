@@ -1,7 +1,33 @@
 <script setup lang="ts">
-import { ref } from 'vue'; import { useRouter } from 'vue-router'; import { ArrowRight, Building2, Lock, Mail, ShieldCheck } from 'lucide-vue-next'; import { useAuthStore } from '@/stores/auth.store'
-const router = useRouter(); const auth = useAuthStore(); const email = ref('admin@smksobat.sch.id'); const password = ref('password123'); const role = ref<'school'|'admin'>('school')
-function autofill(value: 'school'|'admin'): void { role.value = value; email.value = value === 'school' ? 'admin@smksobat.sch.id' : 'superadmin@edusite.id'; password.value = value === 'school' ? 'password123' : 'adminsecret' }
-function submit(): void { auth.loginDemo(role.value); void router.push(role.value === 'admin' ? '/admin' : '/dashboard') }
+import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { ArrowRight, Building2, Lock, Mail, ShieldCheck } from 'lucide-vue-next'
+import { useAuthStore } from '@/stores/auth.store'
+import { useToastStore } from '@/stores/toast.store'
+import { normalizeApiError } from '@/utils/error-handler'
+
+const route = useRoute()
+const router = useRouter()
+const auth = useAuthStore()
+const toast = useToastStore()
+const email = ref('admin@smksobat.sch.id')
+const password = ref('password123')
+const role = ref<'school' | 'admin'>('school')
+
+function autofill(value: 'school' | 'admin'): void {
+  role.value = value
+  email.value = value === 'school' ? 'admin@smksobat.sch.id' : 'superadmin@edusite.id'
+  password.value = value === 'school' ? 'password123' : 'adminsecret'
+}
+
+async function submit(): Promise<void> {
+  try {
+    const user = await auth.login({ email: email.value, password: password.value })
+    const requestedPath = typeof route.query.redirect === 'string' ? route.query.redirect : null
+    await router.push(requestedPath ?? (user.role === 'admin' ? '/admin' : '/dashboard'))
+  } catch (error) {
+    toast.show(normalizeApiError(error).message, 'error')
+  }
+}
 </script>
 <template><div class="relative flex min-h-screen flex-col justify-center overflow-hidden bg-slate-900 py-12 font-sans sm:px-6 lg:px-8"><div class="pointer-events-none absolute left-1/2 top-0 h-[400px] w-[800px] -translate-x-1/2 bg-gradient-to-b from-sky-500/10 to-transparent blur-3xl" /><div class="z-10 text-center sm:mx-auto sm:w-full sm:max-w-md"><div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-xl font-black text-white shadow-xl">E</div><h1 class="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Masuk ke Portal Edusite</h1><p class="mt-1 text-xs text-slate-400 sm:text-sm">Platform Website Builder Multi-Tenant Khusus Sekolah</p></div><div class="z-10 mt-8 px-4 sm:mx-auto sm:w-full sm:max-w-md"><div class="space-y-6 rounded-3xl border border-slate-800 bg-slate-900/90 px-6 py-8 shadow-2xl backdrop-blur-md sm:px-10"><div class="flex items-center gap-1 rounded-xl border border-slate-700 bg-slate-800 p-1"><button type="button" class="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-bold transition-all" :class="role === 'school' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'" @click="autofill('school')"><Building2 class="h-3.5 w-3.5" />User Sekolah</button><button type="button" class="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-bold transition-all" :class="role === 'admin' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'" @click="autofill('admin')"><ShieldCheck class="h-3.5 w-3.5" />SuperAdmin</button></div><form class="space-y-4 text-xs" @submit.prevent="submit"><div><label class="mb-1 block font-semibold text-slate-300">Alamat Email</label><div class="relative"><Mail class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" /><input v-model="email" type="email" required class="w-full rounded-xl border border-slate-700 bg-slate-800/80 py-2.5 pl-9 pr-3 text-xs text-white focus:border-sky-500 focus:ring-2 focus:ring-sky-500/30" /></div></div><div><div class="mb-1 flex items-center justify-between"><label class="font-semibold text-slate-300">Kata Sandi</label><button type="button" class="text-[11px] text-sky-400 hover:underline">Lupa sandi?</button></div><div class="relative"><Lock class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" /><input v-model="password" type="password" required class="w-full rounded-xl border border-slate-700 bg-slate-800/80 py-2.5 pl-9 pr-3 text-xs text-white focus:border-sky-500 focus:ring-2 focus:ring-sky-500/30" /></div></div><button type="submit" class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 py-3 text-xs font-bold text-white shadow-lg transition-all hover:from-sky-600 hover:to-indigo-700 hover:shadow-xl">Masuk Sekarang<ArrowRight class="h-4 w-4" /></button></form><div class="space-y-2 border-t border-slate-800 pt-4 text-[11px] text-slate-400"><span class="block font-bold text-slate-300">💡 Akses Cepat Demo:</span><div class="space-y-1 rounded-xl border border-slate-800 bg-slate-800/50 p-2.5"><p>• <strong>User Sekolah:</strong> Mengelola SMK Sobat & Visual Editor</p><p>• <strong>SuperAdmin:</strong> Mengelola seluruh tenant & template</p></div></div><div class="text-center text-xs text-slate-400">Belum mendaftarkan sekolah Anda? <RouterLink to="/register" class="font-bold text-sky-400 hover:underline">Daftar Akun Baru</RouterLink></div></div></div></div></template>
